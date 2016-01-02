@@ -2,16 +2,22 @@ var net = require('net');
 var EventEmitter = require('events');
 var hexdump = require('hexdump-nodejs');
 
+var gen_name_key = require('./gen_name_key');
+
 var packets = {
 	outgoing: {
 		baram: require('./packets/outgoing/baram'),
 		version: require('./packets/outgoing/version'),
 		login: require('./packets/outgoing/login'),
-		server_change: require('./packets/outgoing/server_change')
+		server_change: require('./packets/outgoing/server_change'),
+		keep_alive_75: require('./packets/outgoing/keep_alive_75'),
+		keep_alive_45: require('./packets/outgoing/keep_alive_45')
 	},
 	incoming: {
 		login: require('./packets/incoming/login'),
-		server_transfer: require('./packets/incoming/server_transfer')
+		server_transfer: require('./packets/incoming/server_transfer'),
+		keep_alive_3B: require('./packets/incoming/keep_alive_3B'),
+		keep_alive_68: require('./packets/incoming/keep_alive_68')
 	}
 };
 
@@ -34,6 +40,8 @@ module.exports = function () {
 	client.connection = null;
 
 	client.server = 'login';
+
+	client.name_key = gen_name_key(client.username);
 
 	client.init_connection = function (host, port) {
 		client.connection = net.connect(port, host);
@@ -94,6 +102,23 @@ module.exports = function () {
 				packets.incoming.server_transfer(client, packet);
 				break;
 
+			case 'main_loop':
+				var id = packet.readUInt8(3);
+
+				if (id === 0x68) {
+					packets.incoming.keep_alive_68(client, packet);
+				}
+
+				else if (id === 0x3B) {
+					packets.incoming.keep_alive_3B(client, packet);
+				}
+
+				else {
+					console.log(new Date(), 'ID', id.toString(16));
+				}
+
+				break;
+
 			default:
 				console.log('handle_packet', client.state, hexdump(packet));
 		}
@@ -128,6 +153,16 @@ module.exports = function () {
 
 			case 'server_change':
 				packets.outgoing.server_change(client, data);
+
+				break;
+
+			case 'keep_alive_75':
+				packets.outgoing.keep_alive_75(client, data);
+
+				break;
+
+			case 'keep_alive_45':
+				packets.outgoing.keep_alive_45(client, data);
 
 				break;
 
