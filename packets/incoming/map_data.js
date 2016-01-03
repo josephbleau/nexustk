@@ -16,7 +16,7 @@ module.exports = function (client, packet) {
 
 	var tiles_data = decrypted_payload.slice(7); /* skip first 7 bytes */
 
-	client.map = [];
+	var map = [];
 
 	for (var i = 0, xi = 0, yi = 0; i < tiles_data.length; i += 6) {
 		var tile_data = new Buffer(tiles_data.slice(i, i + 6));
@@ -27,11 +27,11 @@ module.exports = function (client, packet) {
 			object: tile_data.readUInt16BE(4)
 		};
 
-		if (!client.map[yi]) {
-			client.map[yi] = [];
+		if (!map[yi]) {
+			map[yi] = [];
 		}
 
-		client.map[yi].push(tile);
+		map[yi].push(tile);
 
 		xi += 1;
 
@@ -41,19 +41,7 @@ module.exports = function (client, packet) {
 		}
 	}
 
-	var str = '';
-
-	client.map.forEach(function (row) {
-		row.forEach(function (col) {
-			var walkable = !(col['flags'] || col['object']);
-
-			str += walkable ? '0' : '1';
-		});
-
-		str += '\n';
-	})
-
-	console.log(str);
-
-	client.change_state('main_loop');
+	client.emit_event('map_data', {
+		map: map
+	});
 };

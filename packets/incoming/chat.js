@@ -12,10 +12,8 @@ module.exports = function (client, packet) {
 	var msg_len = decrypted_payload.readUInt8(2);
 	var msg = decrypted_payload.slice(3, 3 + msg_len).toString();
 
-	client.change_state('chat', {
+	client.emit_event('chat', {
 		type: type,
 		msg: msg
 	});
-
-	client.change_state('main_loop');
 };

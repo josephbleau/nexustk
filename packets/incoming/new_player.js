@@ -27,13 +27,11 @@ module.exports = function (client, packet) {
 	var name_len = decrypted_payload.readUInt8(52);
 	var name = decrypted_payload.slice(53, 53 + name_len).toString();
 
-	client.change_state('new_player', {
+	client.emit_event('new_player', {
 		x: x,
 		y: y,
 		dir: dir_map[dir],
 		id: id,
 		name: name
 	});
-
-	client.change_state('main_loop');
 };

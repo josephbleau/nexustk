@@ -33,8 +33,15 @@ module.exports = function (client, packet) {
 
 		var unk1 = object.readUInt8(14);
 
-		console.log('new object', x, y, id);
+		client.emit_event('new object', {
+			x: x,
+			y: y,
+			type1: type1,
+			id: id,
+			graphic_data: graphic_data,
+			dir: dir,
+			type2: type2,
+			unk1: unk1
+		});
 	}
-
-	client.change_state('main_loop');
 };

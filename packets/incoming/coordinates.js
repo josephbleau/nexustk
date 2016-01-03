@@ -18,12 +18,10 @@ module.exports = function (client, packet) {
 	var camera_x = decrypted_payload.readUInt16BE(4);
 	var camera_y = decrypted_payload.readUInt16BE(6);
 
-	client.change_state('coordinates', {
+	client.emit_event('coordinates', {
 		player_x: player_x,
 		player_y: player_y,
 		camera_x: camera_x,
 		camera_y: camera_y
 	});
-
-	client.change_state('main_loop');
 };

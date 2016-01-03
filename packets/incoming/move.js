@@ -23,10 +23,8 @@ module.exports = function (client, packet) {
 	var id = decrypted_payload.readUInt32BE(0);
 	var dir = decrypted_payload.readUInt8(8);
 
-	client.change_state('move', {
+	client.emit_event('move', {
 		id: id,
 		dir: dir_map[dir]
 	});
-
-	client.change_state('main_loop');
 };

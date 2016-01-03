@@ -17,10 +17,8 @@ module.exports = function (client, packet) {
 	var msg_len = decrypted_payload.readUInt16BE(21);
 	var msg = decrypted_payload.slice(23, 23 + msg_len);
 
-	client.change_state('prompt', {
+	client.emit_event('prompt', {
 		id: id,
 		msg: msg
 	});
-
-	client.change_state('main_loop');
 };

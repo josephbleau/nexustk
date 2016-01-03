@@ -22,7 +22,8 @@ var packets = {
 		prompt: require('./packets/incoming/prompt'),
 		new_object: require('./packets/incoming/new_object'),
 		time: require('./packets/incoming/time'),
-		player_id: require('./packets/incoming/player_id')
+		player_id: require('./packets/incoming/player_id'),
+		speech: require('./packets/incoming/speech')
 	},
 	outgoing: {
 		baram: require('./packets/outgoing/baram'),
@@ -112,14 +113,17 @@ module.exports = function () {
 
 			case 'version_response':
 				client.change_state('login');
+
 				break;
 
 			case 'login_response':
 				packets.incoming.login(client, packet);
+
 				break;
 
 			case 'server_transfer':
 				packets.incoming.server_transfer(client, packet);
+
 				break;
 
 			case 'main_loop':
@@ -185,6 +189,10 @@ module.exports = function () {
 					packets.incoming.player_id(client, packet);
 				}
 
+				else if (id === 0x0D) {
+					packets.incoming.speech(client, packet);
+				}
+
 				else {
 					console.log(new Date(), 'ID', id.toString(16));
 				}
@@ -201,6 +209,58 @@ module.exports = function () {
 
 		client.emit('state_change', data);
 	};
+
+	client.emit_event = function (type, data) {
+		client.emit('event', {
+			type: type,
+			data: data
+		});
+	};
+
+	client.on('incoming_event', function (data) {
+		var type = data.type;
+		var data = data.data;
+
+		switch (type) {
+			case 'walk':
+				packets.outgoing.walk(client, data);
+
+				break;
+
+			case 'attack':
+				packets.outgoing.attack(client, data);
+
+				break;
+
+			case 'menu':
+				packets.outgoing.menu(client, data);
+
+				break;
+
+			case 'pickup':
+				packets.outgoing.pickup(client, data);
+
+				break;	
+
+			case 'chat':
+				packets.outgoing.chat(client, data);
+
+				break;	
+
+			case 'whisper':
+				packets.outgoing.whisper(client, data);
+
+				break;
+
+			case 'face':
+				packets.outgoing.face(client, data);
+
+				break;
+
+			default:
+				console.log('unknown event', type);
+		}
+	});
 
 	client.on('incoming_packet', function () {
 		var packet = client.packets.shift();
@@ -240,41 +300,6 @@ module.exports = function () {
 
 			case 'map_request':
 				packets.outgoing.map_request(client, data);
-
-				break;
-
-			case 'walk':
-				packets.outgoing.walk(client, data);
-
-				break;
-
-			case 'attack':
-				packets.outgoing.attack(client, data);
-
-				break;
-
-			case 'menu':
-				packets.outgoing.menu(client, data);
-
-				break;
-
-			case 'pickup':
-				packets.outgoing.pickup(client, data);
-
-				break;	
-
-			case 'chat':
-				packets.outgoing.chat(client, data);
-
-				break;	
-
-			case 'whisper':
-				packets.outgoing.whisper(client, data);
-
-				break;
-
-			case 'face':
-				packets.outgoing.face(client, data);
 
 				break;
 

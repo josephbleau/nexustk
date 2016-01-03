@@ -17,9 +17,7 @@ module.exports = function (client, packet) {
 
 	var time = decrypted_payload.readUInt16BE(decrypted_payload);
 
-	client.change_state('time', {
+	client.emit_event('time', {
 		time: time
 	});
-
-	client.change_state('main_loop');
 };

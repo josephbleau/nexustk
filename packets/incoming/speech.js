@@ -1,3 +1,5 @@
+var hexdump = require('hexdump-nodejs');
+
 var gen_temp_key = require('../../gen_temp_key');
 var crypt_packet = require('../../crypt_packet');
 
@@ -13,13 +15,14 @@ module.exports = function (client, packet) {
 
 	var decrypted_payload = new Buffer(crypt_packet(temp_key, inc, payload));
 
-	var id = decrypted_payload.readUInt32BE(0);
-	var emotion = decrypted_payload.readUInt8(4);
-	var type = decrypted_payload.readUInt8(6);
+	var type = decrypted_payload.readUInt8(0);
+	var id = decrypted_payload.readUInt32BE(1);
+	var msg_len = decrypted_payload.readUInt8(5);
+	var msg = decrypted_payload.slice(6, 6 + msg_len).toString();
 
-	client.emit_event('emote', {
+	client.emit_event('speech', {
+		type: type,
 		id: id,
-		emotion: emotion,
-		type: type
+		msg: msg
 	});
 };

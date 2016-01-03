@@ -15,9 +15,7 @@ module.exports = function (client, packet) {
 
 	var id = decrypted_payload.readUInt32BE(0);
 
-	client.change_state('destroy_object', {
+	client.emit_event('destroy_object', {
 		id: id
 	});
-
-	client.change_state('main_loop');
 };
