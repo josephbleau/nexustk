@@ -5,19 +5,35 @@ var hexdump = require('hexdump-nodejs');
 var gen_name_key = require('./gen_name_key');
 
 var packets = {
+	incoming: {
+		login: require('./packets/incoming/login'),
+		server_transfer: require('./packets/incoming/server_transfer'),
+		keep_alive_3B: require('./packets/incoming/keep_alive_3B'),
+		keep_alive_68: require('./packets/incoming/keep_alive_68'),
+		map_metadata: require('./packets/incoming/map_metadata'),
+		map_data: require('./packets/incoming/map_data'),
+		move: require('./packets/incoming/move'),
+		face: require('./packets/incoming/face'),
+		chat: require('./packets/incoming/chat'),
+		new_player: require('./packets/incoming/new_player'),
+		destroy_object: require('./packets/incoming/destroy_object'),
+		coordinates: require('./packets/incoming/coordinates'),
+		emote: require('./packets/incoming/emote'),
+		prompt: require('./packets/incoming/prompt'),
+		new_object: require('./packets/incoming/new_object'),
+		time: require('./packets/incoming/time'),
+		player_id: require('./packets/incoming/player_id')
+	},
 	outgoing: {
 		baram: require('./packets/outgoing/baram'),
 		version: require('./packets/outgoing/version'),
 		login: require('./packets/outgoing/login'),
 		server_change: require('./packets/outgoing/server_change'),
 		keep_alive_75: require('./packets/outgoing/keep_alive_75'),
-		keep_alive_45: require('./packets/outgoing/keep_alive_45')
-	},
-	incoming: {
-		login: require('./packets/incoming/login'),
-		server_transfer: require('./packets/incoming/server_transfer'),
-		keep_alive_3B: require('./packets/incoming/keep_alive_3B'),
-		keep_alive_68: require('./packets/incoming/keep_alive_68')
+		keep_alive_45: require('./packets/outgoing/keep_alive_45'),
+		map_request: require('./packets/outgoing/map_request'),
+		/*walk: require('./packets/outgoing/walk'),
+		menu: require('./packets/outgoing/menu')*/
 	}
 };
 
@@ -72,8 +88,6 @@ module.exports = function () {
 	};
 
 	client.send = function (data) {
-		console.log(data);
-
 		client.connection.write(data, 'binary');
 	};
 
@@ -111,6 +125,58 @@ module.exports = function () {
 
 				else if (id === 0x3B) {
 					packets.incoming.keep_alive_3B(client, packet);
+				}
+
+				else if (id === 0x15) {
+					packets.incoming.map_metadata(client, packet);
+				}
+
+				else if (id === 0x06) {
+					packets.incoming.map_data(client, packet);
+				}
+
+				else if (id === 0x0C) {
+					packets.incoming.move(client, packet);
+				}
+
+				else if (id === 0x11) {
+					packets.incoming.face(client, packet);
+				}
+
+				else if (id === 0x0A) {
+					packets.incoming.chat(client, packet);
+				}
+
+				else if (id === 0x33) {
+					packets.incoming.new_player(client, packet);
+				}
+
+				else if (id === 0x0E) {
+					packets.incoming.destroy_object(client, packet);
+				}
+
+				else if (id === 0x04) {
+					packets.incoming.coordinates(client, packet);
+				}
+
+				else if (id === 0x1A) {
+					packets.incoming.emote(client, packet);
+				}
+
+				else if (id === 0x30) {
+					packets.incoming.prompt(client, packet);
+				}
+
+				else if (id === 0x07) {
+					packets.incoming.new_object(client, packet);
+				}
+
+				else if (id === 0x20) {
+					packets.incoming.time(client, packet);
+				}
+
+				else if (id === 0x05) {
+					packets.incoming.player_id(client, packet);
 				}
 
 				else {
@@ -166,8 +232,11 @@ module.exports = function () {
 
 				break;
 
+			case 'map_request':
+				packets.outgoing.map_request(client, data);
+
 			default:
-				console.log('state_change', client.state);
+				console.log('state_change', client.state, data);
 		}
 	});
 
