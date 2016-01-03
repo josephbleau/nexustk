@@ -23,6 +23,24 @@ module.exports = function (client, packet) {
 	var id = decrypted_payload.readUInt32BE(0);
 	var dir = decrypted_payload.readUInt8(8);
 
+	var object = client.objects_map[id];
+
+	if (dir === 0) {
+		object.y -= 1;
+	}
+
+	else if (dir === 1) {
+		object.x += 1;
+	}
+
+	else if (dir === 2) {
+		object.x += 1;
+	}
+
+	else if (dir === 3) {
+		object.y += 1;
+	}
+
 	client.emit_event('move', {
 		id: id,
 		dir: dir_map[dir]

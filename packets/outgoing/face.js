@@ -32,6 +32,4 @@ module.exports = function (client, data) {
 	client.send(packet);
 	
 	client.inc += 1;
-
-	client.change_state('main_loop');
 };

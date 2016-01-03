@@ -2,6 +2,7 @@ var net = require('net');
 var EventEmitter = require('events');
 var hexdump = require('hexdump-nodejs');
 
+var dump_map = require('./dump_map');
 var gen_name_key = require('./gen_name_key');
 
 var packets = {
@@ -23,7 +24,8 @@ var packets = {
 		new_object: require('./packets/incoming/new_object'),
 		time: require('./packets/incoming/time'),
 		player_id: require('./packets/incoming/player_id'),
-		speech: require('./packets/incoming/speech')
+		speech: require('./packets/incoming/speech'),
+		reset_coordinates: require('./packets/incoming/reset_coordinates')
 	},
 	outgoing: {
 		baram: require('./packets/outgoing/baram'),
@@ -39,7 +41,8 @@ var packets = {
 		pickup: require('./packets/outgoing/pickup'),
 		chat: require('./packets/outgoing/chat'),
 		attack: require('./packets/outgoing/attack'),
-		whisper: require('./packets/outgoing/whisper')
+		whisper: require('./packets/outgoing/whisper'),
+		refresh: require('./packets/outgoing/refresh')
 	}
 };
 
@@ -65,6 +68,8 @@ module.exports = function () {
 	client.server = 'login';
 
 	client.name_key = gen_name_key(client.username);
+
+	client.objects_map = {};
 
 	client.init_connection = function (host, port) {
 		client.connection = net.connect(port, host);
@@ -193,6 +198,10 @@ module.exports = function () {
 					packets.incoming.speech(client, packet);
 				}
 
+				else if (id === 0x26) {
+					packets.incoming.reset_coordinates(client, packet);
+				}
+
 				else {
 					console.log(new Date(), 'ID', id.toString(16));
 				}
@@ -254,6 +263,26 @@ module.exports = function () {
 
 			case 'face':
 				packets.outgoing.face(client, data);
+
+				break;
+
+			case 'drop_item':
+				packets.outgoing.drop_item(client, data);
+
+				break;
+
+			case 'drop_money':
+				packets.outgoing.drop_money(client, data);
+
+				break;
+
+			case 'refresh':
+				packets.outgoing.refresh(client, data);
+
+				break;
+
+			case 'map_dump':
+				client.emit_event('map_dump', { map: dump_map(client.map, client.objects_map) });
 
 				break;
 

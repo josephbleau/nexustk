@@ -6,13 +6,9 @@ var gen_temp_key = require('../../gen_temp_key');
 var build_packet = require('../../build_packet');
 
 module.exports = function (client, data) {
-	var id = 0x0E;
+	var id = 0x38;
 
 	var payload = [];
-
-	payload.push(data.type);
-	payload.push(data.msg.length);
-	payload = payload.concat(utilities.str_to_chars(data.msg));
 
 	payload.push(0x00);
 

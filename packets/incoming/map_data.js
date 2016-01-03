@@ -41,6 +41,8 @@ module.exports = function (client, packet) {
 		}
 	}
 
+	client.map = map;
+
 	client.emit_event('map_data', {
 		map: map
 	});

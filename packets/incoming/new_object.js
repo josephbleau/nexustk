@@ -33,7 +33,7 @@ module.exports = function (client, packet) {
 
 		var unk1 = object.readUInt8(14);
 
-		client.emit_event('new object', {
+		var new_object = {
 			x: x,
 			y: y,
 			type1: type1,
@@ -41,7 +41,12 @@ module.exports = function (client, packet) {
 			graphic_data: graphic_data,
 			dir: dir,
 			type2: type2,
-			unk1: unk1
-		});
+			unk1: unk1,
+			type: 'npc'
+		};
+
+		client.objects_map[id] = new_object;
+
+		client.emit_event('new object', new_object);
 	}
 };

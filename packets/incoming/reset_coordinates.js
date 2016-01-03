@@ -1,3 +1,5 @@
+var hexdump = require('hexdump-nodejs');
+
 var gen_temp_key = require('../../gen_temp_key');
 var crypt_packet = require('../../crypt_packet');
 
@@ -13,11 +15,21 @@ module.exports = function (client, packet) {
 
 	var decrypted_payload = new Buffer(crypt_packet(temp_key, inc, payload));
 
-	var id = decrypted_payload.readUInt32BE(0);
+	var player_x = decrypted_payload.readUInt16BE(1);
+	var player_y = decrypted_payload.readUInt16BE(3);
 
-	delete client.objects_map[id];
+	var walk_inc = decrypted_payload.readUInt8(9);
 
-	client.emit_event('destroy_object', {
-		id: id
+	client.player_x = player_x;
+	client.player_y = player_y;
+	client.walk_inc = walk_inc;
+
+	client.objects_map[client.player_id].x = client.player_x;
+	client.objects_map[client.player_id].y = client.player_y;
+
+	client.emit_event('reset_coordiantes', {
+		player_x: player_x,
+		player_y: player_y,
+		walk_inc: walk_inc
 	});
 };
