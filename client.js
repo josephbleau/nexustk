@@ -32,8 +32,13 @@ var packets = {
 		keep_alive_75: require('./packets/outgoing/keep_alive_75'),
 		keep_alive_45: require('./packets/outgoing/keep_alive_45'),
 		map_request: require('./packets/outgoing/map_request'),
-		/*walk: require('./packets/outgoing/walk'),
-		menu: require('./packets/outgoing/menu')*/
+		walk: require('./packets/outgoing/walk'),
+		menu: require('./packets/outgoing/menu'),
+		face: require('./packets/outgoing/face'),
+		pickup: require('./packets/outgoing/pickup'),
+		chat: require('./packets/outgoing/chat'),
+		attack: require('./packets/outgoing/attack'),
+		whisper: require('./packets/outgoing/whisper')
 	}
 };
 
@@ -45,6 +50,7 @@ module.exports = function () {
 	client.state = 'disconnected';
 
 	client.inc = 0;
+	client.walk_inc = 0x80;
 
 	client.version = 710;
 
@@ -235,10 +241,47 @@ module.exports = function () {
 			case 'map_request':
 				packets.outgoing.map_request(client, data);
 
+				break;
+
+			case 'walk':
+				packets.outgoing.walk(client, data);
+
+				break;
+
+			case 'attack':
+				packets.outgoing.attack(client, data);
+
+				break;
+
+			case 'menu':
+				packets.outgoing.menu(client, data);
+
+				break;
+
+			case 'pickup':
+				packets.outgoing.pickup(client, data);
+
+				break;	
+
+			case 'chat':
+				packets.outgoing.chat(client, data);
+
+				break;	
+
+			case 'whisper':
+				packets.outgoing.whisper(client, data);
+
+				break;
+
+			case 'face':
+				packets.outgoing.face(client, data);
+
+				break;
+
 			default:
 				console.log('state_change', client.state, data);
 		}
 	});
 
 	return client;
-}();
+};

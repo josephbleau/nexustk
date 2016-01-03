@@ -28,14 +28,24 @@ module.exports = {
 	convert_ip: function (ip) {
 		var parts = [];
 	
-			parts[0] = ip >> 24;
-			parts[1] = (ip >> 16) & 0xFF;
-			parts[2] = (ip >> 8) & 0xFF;
-			parts[3] = ip & 0xFF;
+		parts[0] = ip >> 24;
+		parts[1] = (ip >> 16) & 0xFF;
+		parts[2] = (ip >> 8) & 0xFF;
+		parts[3] = ip & 0xFF;
 
-			return parts.join('.');
+		return parts.join('.');
 	},
 	byte_swap: function (val) {
 		return ((val & 0xFF) << 8) | ((val >> 8) & 0xFF);
+	},
+	push_uint32: function (arr, val) {
+		var parts = [];
+	
+		parts[0] = val >> 24;
+		parts[1] = (val >> 16) & 0xFF;
+		parts[2] = (val >> 8) & 0xFF;
+		parts[3] = val & 0xFF;
+
+		return arr.concat(parts);
 	}
 };
