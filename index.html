@@ -12,6 +12,28 @@ socket.on('event', function (data) {
 		document.getElementById('map').innerHTML = data.data.map;
 	}
 
-	console.log(data.type, data.data);
+	console.log(data.username, data.type, data.data);
 });
+
+var usernames = [
+	'gnij',
+	'gnif',
+	'gnil',
+	'gnio',
+	'gniu'
+];
+
+function init_connections() {
+	usernames.forEach(function (u) {
+		socket.emit('init_connection', { username: u, password: 'aaa1' });
+	});
+}
+
+function mass_emit(type, data) {
+	usernames.forEach(function (u) {
+		socket.emit('incoming_event', { username: u, type: type, data: data });
+	});
+}
+
+init_connections();
 </script>

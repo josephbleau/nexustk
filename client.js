@@ -46,7 +46,7 @@ var packets = {
 	}
 };
 
-module.exports = function () {
+module.exports = function (username, password) {
 	var client = new EventEmitter();
 
 	client.packets = [];
@@ -60,8 +60,8 @@ module.exports = function () {
 
 	client.global_key = 'Urk#nI7ni';
 
-	client.username = 'gnij';
-	client.password = 'aaa1';
+	client.username = username;
+	client.password = password;
 
 	client.connection = null;
 
