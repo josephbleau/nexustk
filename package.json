@@ -1,0 +1,31 @@
+{
+  "name": "nexustk",
+  "version": "1.0.0",
+  "description": "NexusTK client.",
+  "main": "server.js",
+  "dependencies": {
+    "es6-shim": "^0.35.3",
+    "hexdump-nodejs": "^0.1.0",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brandonros/nexustk.git"
+  },
+  "keywords": [
+    "nexustk",
+    "kru",
+    "rpg"
+  ],
+  "author": "brandonros",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brandonros/nexustk/issues"
+  },
+  "homepage": "https://github.com/brandonros/nexustk#readme"
+}
