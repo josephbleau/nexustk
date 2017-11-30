@@ -1,33 +1,117 @@
-<pre id="map"></pre>
+<!doctype html>
+<html>
+	<head>
+	</head>
 
-<script type="text/javascript" src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+	<body>
+		<pre id="map"></pre>
 
-<script type="text/javascript" src="config.js"></script>
+		<hr>
 
-<script type="text/javascript">
-var socket = io('http://127.0.0.1:3000/', {
-	transports: ['websocket']
-});
+		<div id="actions_container"></div>
 
-socket.on('event', function (data) {
-	if (data.type === 'map_dump') {
-		document.getElementById('map').innerHTML = data.data.map;
-	}
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js"></script>
+		<script type="text/javascript" src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
 
-	console.log(data.username, data.type, data.data);
-});
+		<script type="text/javascript" src="config.js"></script>
 
-function init_connections() {
-	config.users.forEach(function (u) {
-		socket.emit('init_connection', { username: u.username, password: u.password });
-	});
-}
+		<script type="text/javascript">
+			var actions = [
+				{id: 'walk', parameters: ['dir','speed']},
+				{id: 'attack', parameters: []},
+				{id: 'menu', parameters: ['id','action']},
+				{id: 'pickup', parameters: ['all']},
+				{id: 'chat', parameters: ['type','msg']},
+				{id: 'whisper', parameters: ['msg','recipient']},
+				{id: 'face', parameters: ['dir']},
+				{id: 'drop_item', parameters: ['index']},
+				{id: 'drop_money', parameters: ['amount']},
+				{id: 'refresh', parameters: []},
+				{id: 'map_dump', parameters: []}
+			];
 
-function mass_emit(type, data) {
-	usernames.forEach(function (u) {
-		socket.emit('incoming_event', { username: u.username, type: type, data: data });
-	});
-}
+			var socket;
 
-init_connections();
-</script>
+			function draw_actions() {
+				var html = '';
+
+				actions.forEach(function(action) {
+					html += '<div>';
+
+					action.parameters.forEach(function(parameter) {
+						html += '<input type="text" class="parameter" data-id="' + action.id + '" data-parameter="' + parameter + '" placeholder="' + parameter + '">';
+					});
+
+					html += '<button type="button" class="action" data-id="' + action.id + '">' + action.id + '</button>';
+
+					html += '</div>';
+				});
+
+				$('#actions_container').html(html);
+			}
+
+			function init_action_events() {
+				$('body').on('click', '.action', function(event) {
+					var button = $(this);
+					var action_id = button.attr('data-id');
+
+					var parameters = $('.parameter[data-id="' + action_id + '"]');
+
+					var body = {};
+
+					parameters.toArray().forEach(function(parameter) {
+						parameter = $(parameter);
+
+						var key = parameter.attr('data-parameter');
+
+						body[key] = parameter.val();
+					});
+
+					config.users.forEach(function(u) {
+						console.log('Emitting', action_id, 'for', u.username, body);
+
+						socket.emit('event', {
+							type: action_id,
+							data: body,
+							username: u.username
+						});
+					});
+				});
+			}
+
+			function connect_to_server() {
+				socket = io('http://127.0.0.1:3000/', {
+					transports: ['websocket']
+				});
+
+				socket.on('event', function (data) {
+					if (data.type === 'map_dump') {
+						$('#map').html(data.data.map);
+					}
+
+					console.log(data.username, data.type, data.data);
+				});
+			}
+
+			function init_connections() {
+				config.users.forEach(function (u) {
+					socket.emit('init_connection', { username: u.username, password: u.password });
+				});
+			}
+
+			function mass_emit(type, data) {
+				usernames.forEach(function (u) {
+					socket.emit('incoming_event', { username: u.username, type: type, data: data });
+				});
+			}
+
+			draw_actions();
+
+			init_action_events();
+
+			connect_to_server();
+
+			init_connections();
+		</script>
+	</body>
+</html>
