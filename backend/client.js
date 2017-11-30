@@ -56,7 +56,7 @@ module.exports = function (username, password) {
 	client.inc = 0;
 	client.walk_inc = 0x80;
 
-	client.version = 710;
+	client.version = 749;
 
 	client.global_key = 'Urk#nI7ni';
 
@@ -100,10 +100,16 @@ module.exports = function (username, password) {
 	};
 
 	client.send = function (data) {
+		console.log('Sending packet; state = ' + client.state);
+		console.log('> ' + hexdump(data));
+
 		client.connection.write(data, 'binary');
 	};
 
 	client.handle_packet = function (packet) {
+		console.log('Received packet; state = ' + client.state);
+		console.log('< ' + hexdump(packet));
+
 		switch (client.state) {
 			case 'connected': 
 				if (client.server === 'login') {
@@ -117,6 +123,12 @@ module.exports = function (username, password) {
 				break;
 
 			case 'version_response':
+				var id = packet.readUInt8(4);
+
+				if (id !== 0x00) {
+					throw new Error('Invalid version');
+				}
+
 				client.change_state('login');
 
 				break;

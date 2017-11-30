@@ -4,11 +4,9 @@ var io = require('socket.io');
 
 var client = require('./client');
 
-var PORT = 3000;
-
 var clients_map = {};
 
-var srv = io(PORT);
+var srv = io(3000);
 
 srv.on('connection', function (socket) {
 	socket.on('init_connection', function (data) {
