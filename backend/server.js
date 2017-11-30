@@ -4,12 +4,16 @@ var io = require('socket.io');
 
 var client = require('./client');
 
-var srv = io(3000);
+var PORT = 3000;
 
 var clients_map = {};
 
+var srv = io(PORT);
+
 srv.on('connection', function (socket) {
 	socket.on('init_connection', function (data) {
+		console.log('New connection for', data.username);
+
 		var key = socket.id + ':' + data.username;
 
 		if (!clients_map[socket.id]) {
@@ -21,6 +25,8 @@ srv.on('connection', function (socket) {
 		c.init_connection('tk0.kru.com', 2000);
 
 		c.on('event', function (event_data) {
+			console.log('Event', event_data.type, data.username);
+
 			socket.emit('event', {
 				type: event_data.type,
 				data: event_data.data,
@@ -55,7 +61,9 @@ srv.on('connection', function (socket) {
 		}
 
 		clients_map[socket.id].forEach(function (c, index) {
-			c.connection.end();
+			if (c.connection) {
+				c.connection.end();
+			}
 
 			delete c;
 
@@ -63,3 +71,5 @@ srv.on('connection', function (socket) {
 		});
 	});
 });
+
+console.log('Listening on port 3000...');
