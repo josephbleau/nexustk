@@ -1,3 +1,5 @@
+var hexdump = require('hexdump-nodejs');
+
 var crypt_packet = require('../../crypt_packet');
 
 module.exports = function (client, packet) {
@@ -6,7 +8,7 @@ module.exports = function (client, packet) {
 	var decrypted_payload = crypt_packet(client.global_key, inc, payload);
 
 	if (decrypted_payload[0] !== 0x00) {
-		throw new Error('Unable to login');
+		throw new Error('Unable to login\n' + hexdump(Buffer.from(decrypted_payload)));
 	}
 
 	client.change_state('server_transfer');
